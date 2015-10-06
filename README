@@ -1,7 +1,8 @@
 Libre Numerals
 --------------
 
-A LibreOffice/OpenOffice Calc extension (AddIn) written in Java to print amount in words.
+LibreOffice/OpenOffice Calc extension (AddIn) written in Java to print amount in words.
+Currently works with Russian and Uzbek languages.
 
 License: Apache v2 (http://www.apache.org/licenses/LICENSE-2.0)
 
