@@ -1,0 +1,3 @@
+Prints amount in words in Russian and Uzbek.
+Consulting & LO extensions development: gmixaz@gmail.com
+Source code: https://github.com/mixaz

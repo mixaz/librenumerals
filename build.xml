@@ -1,0 +1,214 @@
+<project default="all">
+
+	<condition property="os.family" value="unix">  
+		<os family="unix"/>  
+	</condition>  
+	<condition property="os.family" value="windows">  
+		<os family="windows"/>  
+	</condition> 
+	<condition property="isWindows" value="true">  
+		<os family="windows"/>  
+	</condition> 
+	<property file="${os.family}.properties"/>
+
+	<property name="version" value="0.1" />
+
+<!-- If you follow the INSTALL instructions exactly, you won't have to change this path --> 	
+<!--	<property name="UNOHELPER_DIR" value="../UNOHelper" /> -->
+
+<!-- Don't change anything below this line. -->
+	<property name="COMPONENT" value="librenumerals" />
+	<property name="MAKE_DIR" value="." />
+	<property name="RDB_DIR" value="oxt" />
+	<property name="PACKAGE_DIR" value="dist" />
+	<property name="PKG_NAME" value="${COMPONENT}.oxt" />
+	<property name="PKG_FILE" value="${PACKAGE_DIR}/${PKG_NAME}" />
+
+	<property name="SRC_ENCODING" value="UTF-8" />
+	
+	<property name="WollMux_REG_NAME" value="LibreNumeralsCalcService" />
+	<property name="WollMux_COMPJAR" value="${RDB_DIR}/${COMPONENT}.uno.jar" />
+	
+	<property name="RDBFILE" value="${RDB_DIR}/${COMPONENT}.uno.rdb" />
+	<property name="JAVAMAKER_ARGS" value="" />
+
+	<property name="MY_IDL" value="idl" />
+
+	<property name="OOO_CLASSPATH" value="${OOOCLS1}/juh.jar:${OOOCLS1}/jurt.jar:${OOOCLS1}/ridl.jar:${OOOCLS2}/unoil.jar" />
+	<property name="TYPES_RDB" value="${OOO_TYPES_DIR}/types.rdb" />
+	<available file="${OOO_OFFAPI_DIR}/offapi.rdb" property="OFFAPI_RDB" value="${OOO_OFFAPI_DIR}/offapi.rdb" />
+	<property name="OFFAPI_RDB" value="${TYPES_RDB}" /> <!-- Fallback for 2.x installations that don't have OFFAPI_RDB -->
+	
+	<property name="SDK_IDL" value="${OOO_SDK}/idl" />
+
+	<property name="CLASSPATH" value="${OOO_CLASSPATH}"/>
+	
+	<property name="BIN" value="bin" />
+	<property name="SRC" value="src" />
+	<property name="NUMBERS_JAR" location="./thirdparty/numbertowords-1.0-SNAPSHOT.jar" />
+    <!-- The directory that contains the subdirectories com/ and win/ of the SDK -->
+	<!-- First check if we got our own copy of classes/ on the same level as WollMux and UNOHelper -->
+	<available type="dir" file="../classes/bin" property="TOOLING" value="../classes/bin"/>
+	<!-- When building the Debian package, we're a little deeper in the directory tree.
+	     The use of filepath rather than putting the dots in the file attribute
+	     is necessary, because ant aborts with an error if file contains a path that
+	     goes up beyond the filesystem root, which is possible if building e.g. in /tmp -->
+	<available type="dir" filepath="../../../../" file="classes/bin" property="TOOLING" value="../../../../classes/bin"/>
+	<!-- Last resort: Use classes/ subdirectory from OOO_SDK -->
+	<property name="TOOLING" value="${OOO_SDK}/classes" />
+	<echo message="===== Using bootstrap files from ${TOOLING} =====" />
+
+	<buildnumber file="build.version"/>
+
+	<tstamp prefix="build-info">
+		<format property="current-date" pattern="d-MMMM-yyyy" locale="en" />
+		<format property="current-time" pattern="hh:mm:ss a z" locale="en" />
+		<format property="year-month-day" pattern="yyyy-MM-dd" locale="en" />
+	</tstamp>
+
+	<target name="all" depends="debug,WollMux.oxt"/>
+
+	<target name="snapshot" depends="clean, debug, all" />
+
+	<!-- The debug target doesn't do anything by itself, but for any targets executed later
+	     the DEBUG property will be set. --> 
+	<target name="debug">
+	        <echo message="===== Compiling with debug info (RECOMMENDED!) =====" />
+		<property name="DEBUG" value="on" />
+		<!-- If optimization interferes with debugging, it can be disabled. -->
+		<!-- <property name="OPTIMIZE" value="off" /> -->
+	</target>
+	
+	<target name="clean" >
+		<delete includeEmptyDirs="true">
+		<fileset dir="${MY_IDL}" includes="**/*.urd" />
+			<fileset dir="${MY_IDL}" includes="**/*.class" />
+			<fileset dir="${BIN}" />
+			<fileset file="${WollMux_COMPJAR}" />
+			<fileset file="${RDBFILE}" />
+<!--
+			<fileset file="${PKG_FILE}" />
+-->
+		</delete>
+	</target>
+	
+	<!-- Das Target compileidl erzeugt das rdb-file und die java-Interfaces -->
+	<target name="compileidl">
+		<mkdir dir="${BIN}" />
+		<echo message="Types dir: ${OOO_TYPES_DIR}"/>
+		<echo level="info">idlc: Creating .urd files</echo>
+		<apply executable="${OOO_SDK}/bin/idlc" failonerror="true" dest="${MY_IDL}" >
+			<arg value="-C" />
+			<arg value="-I${SDK_IDL}" />
+			<fileset dir="${MY_IDL}" includes="**/*.idl" />
+			<mapper type="glob" from="*.idl" to="*.urd"/>
+		</apply>
+
+		<delete file="${RDBFILE}" />
+		<echo level="info" message="regmerge: Creating ${RDBFILE}" />
+		<apply executable="${OOO_URE_BIN}/regmerge" parallel="true" failonerror="true">
+			<arg line="'${RDBFILE}' /UCR" />
+			<fileset dir="${MY_IDL}" includes="**/*.urd" />
+		</apply>
+
+		<echo level="info">javamaker: Creating .class files</echo>
+		<echo level="info">Hint: See property 'JAVAMAKER_ARGS' in '${os.family}.properties' if you get an error.</echo>
+		<!-- Trick for debugging: 
+		    Replace "javamaker" with "echo"
+		-->
+		<apply verbose="true" executable="${OOO_SDK}/bin/javamaker" relative="true" addsourcefile="false" failonerror="true" dest="${BIN}">
+			<arg line="${JAVAMAKER_ARGS}" />
+			<targetfile />
+
+			<!-- ATTENTION! The ./ before the ${MY_IDL} is important or javamaker fails with
+			the error message ERROR: Cannot create temporary file for idl/de/muenchen/allg/itd51/wollmux/....class
+			-->
+			<arg value="-nD" />
+			<arg value="${TYPES_RDB}" />
+			<arg value="${OFFAPI_RDB}" />
+			<arg value="${RDBFILE}" />
+			<arg value="-O" />
+			<arg value="./${MY_IDL}" />
+			<fileset dir="${MY_IDL}" includes="**/*.urd" />
+			<mapper type="package" from="*.urd" to="-T*" />
+		</apply>
+	</target>
+	
+	<target name="compile" depends="compileidl">
+		<property name="DEBUG" value="off" />
+		<property name="OPTIMIZE" value="on" />
+
+<!--
+		<javac srcdir="${UNOHELPER_SRC}"
+			destdir="${UNOHELPER_BIN}"
+			classpath="${OOO_CLASSPATH}"
+			includeAntRuntime="false"
+			encoding="${SRC_ENCODING}"
+			debug="${DEBUG}"
+			optimize="${OPTIMIZE}"
+			source="1.5"
+			target="1.5"
+		/>
+-->		
+		<javac srcdir="${SRC}"
+			destdir="${BIN}"
+			classpath="${CLASSPATH}:${MY_IDL}:${TOOLING}:${NUMBERS_JAR}"
+			includeAntRuntime="false"
+			encoding="${SRC_ENCODING}"
+			debug="${DEBUG}"
+			optimize="${OPTIMIZE}"
+			   source="1.5"
+			   target="1.5"
+		/>
+	</target>
+
+	<target name="WollMux.uno.jar" depends="compile, compileidl">
+		<delete file="${WollMux_COMPJAR}" />
+
+		<jar destfile="${WollMux_COMPJAR}">
+			<zipfileset src="${NUMBERS_JAR}" includes="**/*.class" excludes="sample/**"/>
+			<fileset dir="${BIN}" includes="**/*.class"/>
+			<fileset dir="${MY_IDL}" includes="**/*.class"/>
+			<manifest>
+				<attribute name="RegistrationClassName" value="${WollMux_REG_NAME}" />
+				<attribute name="UNO-Type-Path" value="${COMPONENT}.uno.jar" />
+			</manifest>
+		</jar>
+	</target>
+
+	<target name="WollMux.oxt" depends="WollMux.uno.jar">
+		<delete file="${PKG_FILE}" />
+        <copy todir="${BIN}" file="description.xml">
+            <filterset>
+                <filter token="VERSION" value="${version}"/>
+            </filterset>
+        </copy>
+        <zip destfile="${PKG_FILE}">
+			<fileset file="${WollMux_COMPJAR}" />
+			<fileset file="${RDBFILE}" />
+			<fileset dir="${RDB_DIR}">
+				<include name="META-INF/manifest.xml" />
+			</fileset>
+			<fileset dir=".">
+				<include name="description/*.txt" />
+			</fileset>
+            <fileset file="${BIN}/description.xml" />
+		</zip>
+	</target>
+
+	<!-- Das Target install installiert/reinstalliert das erzeugte uno-package -->
+	<target name="install" depends="WollMux.oxt">
+		<echo level="info">unopkg remove ${PKG_NAME}:</echo>
+		<exec executable="unopkg" failifexecutionfails="false">
+			<arg line="remove ${PKG_NAME}" />
+		</exec>
+		<echo level="info">unopkg add ${PKG_NAME}:</echo>
+		<exec executable="unopkg" failifexecutionfails="false">
+			<arg line="add ${PKG_FILE}" />
+		</exec>
+		
+		<tstamp><format property="mytime" pattern="HH:mm:ss"/></tstamp>
+		<echo level="info" message="Install finished at ">${mytime}</echo>
+	</target>
+
+</project>

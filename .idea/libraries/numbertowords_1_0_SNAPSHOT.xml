@@ -1,0 +1,15 @@
+<component name="libraryTable">
+  <library name="numbertowords-1.0-SNAPSHOT">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/thirdparty/numbertowords-1.0-SNAPSHOT.jar!/" />
+      <root url="jar://$USER_HOME$/LibreOfficeDev_5.1.0.0.alpha1_Linux_x86-64_archive/program/classes/juh.jar!/" />
+      <root url="jar://$USER_HOME$/LibreOfficeDev_5.1.0.0.alpha1_Linux_x86-64_archive/program/classes/jurt.jar!/" />
+      <root url="jar://$USER_HOME$/LibreOfficeDev_5.1.0.0.alpha1_Linux_x86-64_archive/program/classes/ridl.jar!/" />
+      <root url="jar://$USER_HOME$/LibreOfficeDev_5.1.0.0.alpha1_Linux_x86-64_archive/program/classes/unoil.jar!/" />
+      <root url="jar://$PROJECT_DIR$/thirdparty/log4j-1.2.16.jar!/" />
+      <root url="jar://$USER_HOME$/Downloads/Oracle/ojdbc14.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

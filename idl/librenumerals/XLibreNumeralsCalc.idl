@@ -1,0 +1,60 @@
+#ifndef INCLUDED_COM_UPSILONSTUDIO_LIBRENUMERALS_IDL
+#define INCLUDED_COM_UPSILONSTUDIO_LIBRENUMERALS_IDL
+
+#include <com/sun/star/beans/XPropertySet.idl>
+#include <com/sun/star/sheet/AddIn.idl>
+
+#include <com/sun/star/uno/XInterface.idl>
+
+module librenumerals {
+
+      interface XLibreNumeralsCalc
+      {
+
+//            void logout();
+
+            /** Declare your methods:
+                This is where you could add the declarations of your methods.
+                If you want to learn more about
+                the IDL syntax including the base types, you could
+                visit the following web page:
+                http://www.openoffice.org/project/udk/common/man/idl_syntax.html .
+             */
+            string amountRU(
+                 /** Parameters:
+                     You could insert further arguments after the
+                     parameter xOptions.
+                  */
+                 [in] com::sun::star::beans::XPropertySet xOptions,
+                 [in] double amount
+            );
+//            /*raises( com::sun::star::uno::Exception );*/
+//            string amountUS(
+//                 [in] com::sun::star::beans::XPropertySet xOptions,
+//                 [in] double amount
+//            );
+            string amountUZ(
+                 [in] com::sun::star::beans::XPropertySet xOptions,
+                 [in] double amount
+            );
+
+       };
+
+       service Numerals
+       {
+            /** Exported interfaces:
+                This is where you put all interfaces that this service exports. The service
+                supports its main interface only.
+             */
+           interface XLibreNumeralsCalc;
+
+           /** Necessary base service.
+               All add-ins must implement this service
+            */
+           service com::sun::star::sheet::AddIn;
+       };
+
+};
+
+#endif
+

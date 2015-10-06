@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<description xmlns="http://openoffice.org/extensions/description/2006"
+	     xmlns:xlink="http://www.w3.org/1999/xlink">
+	<version value="@VERSION@" />
+	<identifier value="com.upsilon-studio.librenumerals"/>
+	<dependencies>
+		<OpenOffice.org-minimal-version value="2.1" name="OpenOffice.org 2.1"/>
+	</dependencies>
+
+	<publisher>
+		<name xlink:href="https://github.com/mixaz" lang="en">Mikhail Zemlyanukha</name>
+	</publisher>
+
+	<display-name>
+		<name lang="en">Libre Numerals</name>
+	</display-name>
+
+    <extension-description>
+        <src xlink:href="description/desc_ru.txt" lang="ru" />
+        <src xlink:href="description/desc_en.txt" lang="en" />
+    </extension-description>
+    <!--
+        <update-information>
+          <src xlink:href="http://limux.tvc.muenchen.de/ablage/sonstiges/wollmux/packages/WollMux-snapshot/WollMux.update.xml"/>
+        </update-information>
+        -->
+<!--	<registration>
+		<simple-license accept-by="admin" default-license-id="en-NZ" suppress-on-update="true" >
+			<license-text xlink:href="registration/license_de-DE.txt" lang="de-DE" />
+			<license-text xlink:href="registration/license_en-GB.txt" lang="en-GB" />
+			<license-text xlink:href="registration/license_en-NZ.txt" lang="en-NZ" license-id="en-NZ" />
+			<license-text xlink:href="registration/license_en-US.txt" lang="en-US" />
+		</simple-license>
+	</registration>
+-->
+</description>

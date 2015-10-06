@@ -1,0 +1,23 @@
+Libre Numerals
+--------------
+
+A LibreOffice/OpenOffice Calc extension (AddIn) written in Java to print amount in words.
+
+License: Apache v2 (http://www.apache.org/licenses/LICENSE-2.0)
+
+Uses third party library Numerals https://github.com/vitalker/numerals under GPL v3 (Apache 2 compatible)
+
+Ant script was inspired by https://github.com/WollMux/WollMux
+
+How to build from source code:
+
+1. Instal JDK (I used 1.7 but 1.5,1.6,1.8 may work as well)
+2. Install LibreOffice and LibO SDK
+3. Install Apache Ant
+4. Configure unix.properties when building on Linux (windows.properties for Windows) to point to LibO/SDK folders installed above
+5. run ant
+
+To edit source code I used IntelliJ Idea, you can import project there. You'll need to change path to LibO/SDK libraries if necessary.
+
+Mikhail Zemlyanukha gmixaz@gmail.com
+Consulting and SW development
